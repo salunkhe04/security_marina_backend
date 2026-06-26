@@ -1,10 +1,10 @@
 import { Router } from "express";
-import MarinaVisitorModel from "../../model/visitor.model.js";
 import { successRes2 } from "../../middlewares/response.js";
+import visitorModel from "../../model/visitor.model.js";
 
-const marinaBayVisitor = Router();
+const visitor = Router();
 
-marinaBayVisitor.post("/add-marina-bay-visitors", async (req, res) => {
+visitor.post("/add-visitor", async (req, res) => {
   const body = req.body;
 
   const {
@@ -26,7 +26,7 @@ marinaBayVisitor.post("/add-marina-bay-visitors", async (req, res) => {
     if (!checkInPhoto) return errorRes2(res, 403, "Check in photo is required");
     if (!peopleCount) return errorRes2(res, 403, "Count is required");
 
-    const newVisitor = await MarinaVisitorModel.create({ ...body });
+    const newVisitor = await visitorModel.create({ ...body });
 
     await newVisitor.save();
 
@@ -36,7 +36,7 @@ marinaBayVisitor.post("/add-marina-bay-visitors", async (req, res) => {
   }
 });
 
-marinaBayVisitor.get("/marina-bay-visitors", async (req, res) => {
+visitor.get("/visitors", async (req, res) => {
   try {
     let query = req.query.query || "";
     let project = req.query.project;
@@ -51,7 +51,7 @@ marinaBayVisitor.get("/marina-bay-visitors", async (req, res) => {
       ...(project != null ? { project: project } : null),
     };
 
-    const user = await MarinaVisitorModel.find(searchFilter).sort({
+    const user = await visitorModel.find(searchFilter).sort({
       createdAt: -1,
     });
 
@@ -61,7 +61,7 @@ marinaBayVisitor.get("/marina-bay-visitors", async (req, res) => {
   }
 });
 
-marinaBayVisitor.post("/marina-bay-check-out/:id", async (req, res, next) => {
+visitor.post("/visitor-check-out/:id", async (req, res, next) => {
   const { checkOutTime, checkOutPhoto } = req.body;
   const { id } = req.params;
   try {
@@ -69,11 +69,11 @@ marinaBayVisitor.post("/marina-bay-check-out/:id", async (req, res, next) => {
     if (!checkOutTime) return errorRes2(res, 401, "time is Required");
     if (!checkOutPhoto) return errorRes2(res, 401, "check photo Required");
 
-    const existingResp = await MarinaVisitorModel.findById(id);
+    const existingResp = await visitorModel.findById(id);
 
     if (!existingResp) return errorRes2(res, 404, "Not Found");
 
-    const resp = await MarinaVisitorModel.findByIdAndUpdate(
+    const resp = await visitorModel.findByIdAndUpdate(
       id,
       {
         ...req.body,
@@ -87,4 +87,4 @@ marinaBayVisitor.post("/marina-bay-check-out/:id", async (req, res, next) => {
   }
 });
 
-export default marinaBayVisitor;
+export default visitor;

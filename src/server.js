@@ -11,7 +11,7 @@ export const app = express();
 app.use(cors());
 app.use(express.json({ limit: "128mb" }));
 app.use(express.urlencoded({ limit: "128mb", extended: true }));
-app.set("trust proxy", 1);
+// app.set("trust proxy", 1);
 
 app.use("/", router);
 
