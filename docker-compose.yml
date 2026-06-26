@@ -1,0 +1,25 @@
+services:
+  evh-com-backend:
+    build: .
+    container_name: security_marina_backend
+    restart: unless-stopped
+    network_mode: host
+
+    env_file:
+      - .env
+
+    environment:
+      PORT: 8087
+      TZ: Asia/Kolkata
+
+    mem_limit: 1024m
+    cpus: "1"
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8087/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
