@@ -1,7 +1,7 @@
 import { Router } from "express";
 import visitor from "./visitor/visitor.js";
 import appUpdateModel from "../model/appUpdate.js";
-import { errorRes2, successRes2 } from "../middlewares/response.js";
+import { errorRes2, successRes2, } from "../middlewares/response.js";
 
 const router = Router();
 
