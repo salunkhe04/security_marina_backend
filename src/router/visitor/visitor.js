@@ -39,24 +39,45 @@ visitor.post("/add-visitor", async (req, res) => {
 visitor.get("/visitors", async (req, res) => {
   try {
     let query = req.query.query || "";
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    let skip = (page - 1) * limit;
     let project = req.query.project;
+
     const isNumberQuery = !isNaN(query);
-    let searchFilter = {
-      $or: [
-        { name: { $regex: query, $options: "i" } },
 
-        isNumberQuery ? { phoneNumber: Number(query) } : null,
-      ].filter(Boolean),
+    const searchFilter = {
+      ...(query
+        ? {
+            $or: [
+              { name: { $regex: query, $options: "i" } },
+              isNumberQuery ? { phoneNumber: Number(query) } : null,
+            ].filter(Boolean),
+          }
+        : {}),
 
-      ...(project != null ? { project: project } : null),
+      ...(project ? { project } : {}),
     };
 
-    const user = await visitorModel.find(searchFilter).sort({
-      createdAt: -1,
-    });
+    const user = await visitorModel
+      .find(searchFilter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    return successRes2(res, 200, "Get Marina Bay Visitors", { data: user });
+    const totalItems = await visitorModel.countDocuments(searchFilter);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return successRes2(res, 200, "Get Marina Bay Visitors", {
+      page,
+      limit,
+      totalPages,
+      totalItems,
+      total: user.length,
+      data: user,
+    });
   } catch (error) {
+    console.log(error);
     return errorRes2(res, 500, "Internal Server Error", error);
   }
 });
