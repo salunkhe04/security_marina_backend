@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { successRes2 } from "../../middlewares/response.js";
+import { errorRes2, successRes2 } from "../../middlewares/response.js";
 import visitorModel from "../../model/visitor.model.js";
 
 const visitor = Router();
